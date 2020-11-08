@@ -266,7 +266,6 @@ function step(){
     heroMove();
     
     eraseMap();
-    
     drawMap();
 
     
@@ -342,45 +341,6 @@ function heroMove(){
     return;
 }
 
-function logic(){
-    for(let i = 0; i < gameMap.length; i++)
-        for(let j = 0; j < gameMap[0].length; j++){
-            if(holes[i][j] == 1) detectHole(i,j);
-            if(wampuses[i][j] == 1) detectWampus(i,j);
-        }
-}
-
-function pointAsHole(x,y){
-    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 ) holes[y][x-1] = 1;
-    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 ) holes[y-1][x] = 1;
-    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && holes[y+1][x] == 0 ) holes[y+1][x] = 1;
-    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && holes[y][x+1] == 0 ) holes[y][x+1] = 1;
-}
-
-function pointAsWampus(x,y){
-    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;
-    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
-    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
-    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
-}
-
-function detectHole(y,x){
-   
-}
-
-function detectWampus(y,x){
-   
-}
-
-// const WALL = 1;
-// const EMPTYNESS = 2;
-// const GOLD = 3;
-// const AGENT = 5;
-// const WAMPUS = 7;
-// const HOLE = 9;
-// const SMELL = 8;
-// const WIND = 4;
-
 
 function grab(){
     gameStatus = 1;
@@ -412,7 +372,45 @@ function goBack(){
             pacman.y--; 
             pacman.direction = "up"} break;
     }
+
+    eraseMap();
+    drawMap();
 }
+
+//---------------------------------------
+// Logic functions
+//---------------------------------------
+
+function logic(){
+    for(let i = 0; i < gameMap.length; i++)
+        for(let j = 0; j < gameMap[0].length; j++){
+            if(holes[i][j] == 1) detectHole(i,j);
+            if(wampuses[i][j] == 1) detectWampus(i,j);
+        }
+}
+
+function pointAsHole(x,y){
+    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 ) holes[y][x-1] = 1;
+    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 ) holes[y-1][x] = 1;
+    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && holes[y+1][x] == 0 ) holes[y+1][x] = 1;
+    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && holes[y][x+1] == 0 ) holes[y][x+1] = 1;
+}
+
+function pointAsWampus(x,y){
+    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;
+    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
+    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
+    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
+}
+
+function detectHole(y,x){
+   
+}
+
+function detectWampus(y,x){
+   
+}
+
 
 //---------------------------------------
 // Feel functions
