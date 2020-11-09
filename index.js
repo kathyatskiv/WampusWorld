@@ -220,7 +220,7 @@ let wampus = {
 function step(){
     if(gameStatus > 0) return;
     visited[pacman.y][pacman.x] = true;
-    let feeling = feel();
+    let feeling = feel(pacman.x, pacman.y);
     console.log("pacman " + pacman.x + " " + pacman.y + " " + pacman.direction);
     for(let i = 0; i < agentMap.length; i++){
         console.log(agentMap[i]); 
@@ -232,7 +232,6 @@ function step(){
         wampus.alive = false;
     
     if(feeling[4]){
-        console.log("back");
         goBack();
         return;
     }
@@ -260,9 +259,6 @@ function step(){
     
     
     logic();
-    for(let i = 0; i < agentMap.length; i++){
-        console.log(agentMap[i]); 
-     }
     heroMove();
     
     eraseMap();
@@ -280,7 +276,6 @@ function heroMove(){
         agentMap[pacman.y][pacman.x+1] = AGENT;
         pacman.x++;
         pacman.direction = "right"; 
-        console.log("right ");
         return;
     }
 
@@ -288,7 +283,6 @@ function heroMove(){
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y-1][pacman.x] = AGENT;
         pacman.direction = "up"; 
-        console.log("up");
         pacman.y--;
         return;
     }
@@ -296,7 +290,7 @@ function heroMove(){
     if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS && visited[pacman.y][pacman.x-1] == false) {
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y][pacman.x-1] = AGENT;
-        console.log("left");
+        pacman.direction = "left"; 
         pacman.x--; 
         return;
     }
@@ -304,7 +298,7 @@ function heroMove(){
     if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS && visited[pacman.y+1][pacman.x] == false) {
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y+1][pacman.x] = AGENT;
-        console.log("down");
+        pacman.direction = "down"; 
         pacman.y++;
         return;
     }
@@ -312,14 +306,14 @@ function heroMove(){
     if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS){
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y][pacman.x-1] = AGENT;
-        console.log("left nv");
+        pacman.direction = "left"; 
         pacman.x--; 
         return; 
     }
     if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS){
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y+1][pacman.x] = AGENT;
-        console.log("down nv");
+        pacman.direction = "down"; 
         pacman.y++;
         return;
     }
@@ -327,14 +321,14 @@ function heroMove(){
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y][pacman.x+1] = AGENT;
         pacman.x++; 
-        console.log("right nv");
+        pacman.direction = "right"; 
         return;
     }
     if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == EMPTYNESS) {
         agentMap[pacman.y][pacman.x] = EMPTYNESS;
         agentMap[pacman.y-1][pacman.x] = AGENT;
         pacman.y--;
-        console.log("up nv");
+        pacman.direction = "up"; 
         return;
     }
 
@@ -416,12 +410,13 @@ function detectWampus(y,x){
 // Feel functions
 //---------------------------------------
 
-function feel(){
-    let iS = isStench(pacman.x,pacman.y);
-    let iB = isBreeze(pacman.x,pacman.y);
-    let iG = isGlitter(pacman.x,pacman.y);
-    let iSc = isScream(pacman.x,pacman.y);
-    let iBm = isBump(pacman.x,pacman.y);
+function feel(x,y){
+    console.log(x + " " + y);
+    let iS = isStench(x,y);
+    let iB = isBreeze(x,y);
+    let iG = isGlitter(x,y);
+    let iSc = isScream(x,y);
+    let iBm = isBump(x,y);
 
     let ans = [iS, iB, iG, iSc, iBm]
 
@@ -441,8 +436,8 @@ function isBreeze(x, y){
 function isStench(x, y){
     if(x > 0 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
     if(y > 0 && (gameMap[y-1][x] == WAMPUS || (gameMap[y-1][x] == SMELL))) return true;
-    if(x < (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
-    if(y < (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
+    if(x < gameMap[0].length - 1 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
+    if(y < gameMap.length - 1 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
     
     return false;
 }
