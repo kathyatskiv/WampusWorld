@@ -24,8 +24,8 @@ body{
 }
 
 .container{
-    width: 100px;
-    height: 100px;
+    width: 500px;
+    height: 500px;
     margin: 50px auto;
 
     display: flex;
@@ -35,8 +35,8 @@ body{
 }
 
 .tile{
-    width: 25px;
-    height: 25px;
+    width: 125px;
+    height: 125px;
     
     background-color: bisque;
 }

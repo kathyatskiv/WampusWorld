@@ -147,8 +147,8 @@ function setUpMap(){
 */
 gameMap =
         [[0,0,9,0],
-        [0,7,0,0],
-        [0,0,1,1],
+        [0,7,0,GOLD],
+        [0,0,0,1],
         [5,0,0,0]];
         createMap(gameMap);
 
@@ -450,7 +450,7 @@ function cleanWampuses(x, y){
     for(let j = 0; j < wampuses[0].length; j++){
         wampuses[i][j] = -1;
 
-        if(visited[i][j] && isStench(i,j)){
+        if(visited[i][j] && isStench(i,j) && agentMap[i][j] != WALL){
             if(j < gameMap[0].length - 1 && agentMap[i][j+1] == 0) agentMap[i][j+1] = EMPTYNESS;
             if(i > 0 && agentMap[i-1][j] == 0) agentMap[i-1][j] = EMPTYNESS
             if(j > 0 && agentMap[i][j-1] == 0) agentMap[i][j-1] = EMPTYNESS
@@ -679,26 +679,7 @@ function detectWampus(y,x){
         wampuses[y-1][x] =1;
     }
 }
-    /*
-    if(wampuses[y+1][x]==SMELL&&wampuses[y][x-1]==SMELL && wampuses[y+1][x-1]==-1){
-        wampuses[y][x] = 2;
-        wampuses[y+1][x]=-1;
-        wampuses[y][x-1] = -1;
-    };
-    if(wampuses[y+1][x] ==SMELL && wampuses[y-1][x]==SMELL){
-        wampuses[y][x] = 2;
-        wampuses[y+1][x] = 1;
-        wampuses[y-1][x] =1;
-    };
-    if(wampuses[y][x-1]==SMELL&&wampuses[y][x+1]==SMELL){
-        wampuses[y][x]=2;
-        wampuses[y][x-1]=1;
-        wampuses[y][x+1]=1;
-    }
-    
-}
 
-*/
 //---------------------------------------
 // Feel functions
 //---------------------------------------
@@ -782,7 +763,7 @@ function init(){
 
     drawMap();
 
-    setInterval(step,1000)
+    setInterval(step,500)
 
 }
 
@@ -800,7 +781,6 @@ function removeAllChildren(elem){
 function endGame(){
     eraseMap();
     scoreTitle = document.getElementById("score");
-    document.body.removeChild(scoreTitle);
 
     message = document.createElement("h1");
     message.classList.add("title");
@@ -810,7 +790,7 @@ function endGame(){
     btnRetry.innerHTML = "Retry";
 
 
-    switch(res){
+    switch(gameStatus){
         case 1:
             message.innerHTML = "You lose!" + score;
             break;
