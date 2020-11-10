@@ -139,12 +139,17 @@ function setUpMap(){
             [false,false,false,false]
         ];
 
-        gameMap =
-        [[0,1,9,0],
-        [7,0,1,0],
+       /* gameMap =
+        [[0,1,0,0],
+        [7,9,1,0],
         [0,0,0,0],
-        [5,0,0,9]];
-
+        [5,0,0,0]];
+*/
+gameMap =
+        [[0,0,9,0],
+        [0,7,0,0],
+        [0,0,1,1],
+        [5,0,0,0]];
         createMap(gameMap);
 
         //console.log(emptyMap);
@@ -241,9 +246,16 @@ let wampus = {
 function step(){
     if(gameStatus > 0) return;
     console.log(visited);
-    console.log("pacman " + pacman.x + " " + pacman.y + " " + pacman.direction);
+//     console.log("pacman " + pacman.x + " " + pacman.y + " " + pacman.direction);
+//     console.log ("WAMPUSES" + wampuses);
+//    console.log("HOLES" + holes);
+//    console.log("ISBREEZE" + isBreeze(0,3));
+//    console.log("ISBREEZE" + isBreeze(3,2));
+
+
     visited[pacman.y][pacman.x] = true;
 
+    //stench,breeze,glitter,scream,bump
     let feeling = feel(pacman.x, pacman.y);
 
     for(let i = 0; i < agentMap.length; i++){
@@ -255,18 +267,19 @@ function step(){
     if(feeling[3])
         wampus.alive = false;
     
+
     if(feeling[4]){
         goBack();
         return;
     }
     
-   if(feeling[0])
-       pointAsWampus();
+   if(feeling[0] && wampus.x == undefined)
+       pointAsWampus(pacman.x, pacman.y);
 
    if(feeling[1])
        pointAsHole(pacman.x, pacman.y);
 
-    if(!feeling[0] && !feeling[1]){
+    if((false || !feeling[0]) && !feeling[1]){
         if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == 0) agentMap[pacman.y][pacman.x+1] = EMPTYNESS;
         if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == 0) agentMap[pacman.y-1][pacman.x] = EMPTYNESS
         if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == 0) agentMap[pacman.y][pacman.x-1] = EMPTYNESS
@@ -285,7 +298,7 @@ function step(){
     logic();
 
     for(let i = 0; i < holes.length; i++){
-        console.log(holes[i]); 
+        console.log(wampuses[i]); 
      }
 
     heroMove();
@@ -428,9 +441,26 @@ function logic(){
             if(agentMap[i][j] == EMPTYNESS) {holes[i][j] = -1; wampuses[i][j] = -1;}
             if(holes[i][j] == 1) detectHole(i,j);
             if(wampuses[i][j] == 1) detectWampus(i,j);
+
+            if(wampuses[i][j] == 2) cleanWampuses(j,i);
         }
 }
-/*
+function cleanWampuses(x, y){
+    for(let i = 0; i < wampuses.length; i++)
+    for(let j = 0; j < wampuses[0].length; j++){
+        wampuses[i][j] = -1;
+
+        if(visited[i][j] && isStench(i,j)){
+            if(j < gameMap[0].length - 1 && agentMap[i][j+1] == 0) agentMap[i][j+1] = EMPTYNESS;
+            if(i > 0 && agentMap[i-1][j] == 0) agentMap[i-1][j] = EMPTYNESS
+            if(j > 0 && agentMap[i][j-1] == 0) agentMap[i][j-1] = EMPTYNESS
+            if(i < gameMap.length - 1 && agentMap[i+1][j] == 0) agentMap[i+1][j] = EMPTYNESS
+        }
+    }
+    wampuses[y][x] = 2;
+
+}
+
 function pointAsHole(x,y){
     if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 ) holes[y][x-1] = 1;
     if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 ) holes[y-1][x] = 1;
@@ -439,51 +469,236 @@ function pointAsHole(x,y){
 }
 
 function pointAsWampus(x,y){
-    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;
-    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
-    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
-    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
-}*/
-function pointAsHole(x,y){
-    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 && (isBreeze(x,y)||isBreeze(x+1,y)) ) holes[y][x-1] = 1;
-    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 &&(isBreeze(x,y)||isBreeze(x+1,y))) holes[y-1][x] = 1;
-    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && holes[y+1][x] == 0 && (isBreeze(x,y)||isBreeze(x+1,y) )) holes[y+1][x] = 1;
-   // if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && holes[y][x+1] == 0 (isBreeze(x,y) || isBreeze(x+1,y))) holes[y][x+1] = 1;
+    try{ if(agentMap[y][x-1] == 0 && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;} catch{}
+    try{if(agentMap[y-1][x] == 0 && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;} catch{}
+    try{if(agentMap[y+1][x] == 0 && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;} catch{}
+    try{if(agentMap[y][x+1] == 0 && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;} catch{}
 }
-function pointAsWampus(x,y){
-    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;
-    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
-    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
-    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
-}
+
+
 function detectHole(y,x){
     if(agentMap[y][x] == EMPTYNESS) {holes[y][x] = -1; return;}
-    // opposites
-   if(((x < gameMap[0].length - 1 && holes[y][x+1]==1) && (x>0 && holes[y][x-1]==1))|| ((y < gameMap.length - 1 && holes[y+1][x]==1) && (y>0 && holes[y-1][x]==1))) {
-       holes[y][x]=2;
-       agentMap[y][x] = 9;
-   }
-   // diagonal
-   //if((holes[y-1][x-1]==1 && holes [y+1][x+1]==1)||(holes[y-1][x+1]==1 && holes[y+1][x-1]==1)) holes[y][x] =2;
-   // corner
-   if(((y>0 && holes[y-1][x]==1) && (x < gameMap[0].length - 1 && holes[y][x+1]==1))
-   ||((y>0 && holes[y-1][x]==1) && (x < gameMap[0].length - 1 && holes[y][x-1]==1))
-   ||((y < gameMap.length - 1 && holes[y+1][x]) && (x < gameMap[0].length - 1 && holes[y][x+1]))
-   ||((y < gameMap.length - 1 && holes[y+1][x]) && (x>0 && holes[y][x-1]))){
+    if(x > 0 && y < gameMap[0].length-1 && y > 0 && isBreeze(x, y+1)==true && isBreeze(x-1,y)==true
+     && isBreeze(x, y-1)==false)
+         {
+             agentMap[y][x] = HOLE;
+             holes[y][x]=2;
+             holes[y+1][x]=-1;
+             holes[y][x-1] =-1;
+             holes[y+1][x-1]=-1;
+             holes[x-1][y+1]  =-1
+         }
+    if(y > 0 && x < gameMap[0].length-1 &&  isBreeze(x-1,y) == true 
+            && isBreeze(x,y-1)==true && isBreeze(x+1,y)==true){
+             agentMap[y][x] = HOLE;
+               holes[y][x] = 2;
+               holes[y-1][x]=-1;
+               holes[y][x+1] = -1;
+               holes[x+1][y+1]=-1;
+            };
+    if(y >0 && x < gameMap[0].length-1 && isBreeze(x,y-1)==true 
+                && isBreeze(x-1,y)==true && isBreeze(x,y-1)==false)
+                {
+                    agentMap[y][x] = HOLE;
 
-       holes[y][x]=2;
-       agentMap[y][x] = 9;
-   }
+                    holes[y][x] = 2;
+                    holes[y+1][x]=-1;
+                    holes[y][x+1] = -1;
+                };
+    if(y < gameMap[0].length-1 && x >0  
+                && isBreeze(x, y+1)==true && isBreeze(x-1,y)&&isBreeze(x-1, y)==false){
+                    agentMap[y][x] = HOLE;
 
-   }
+                    holes[y][x] = 2;
+                    
+                    holes[y+1][x]=-1;
+                    holes[y][x-1] = -1;
+                }
+    if(y < gameMap[0].length -1 && y > 0 
+                &&  isBreeze(x,y-1)==true && isBreeze(x,y+1)==true 
+                && isBreeze(x-1,y)==true&& isBreeze(x+1,y)==true){
+                    agentMap[y][x] = HOLE;
 
+                    holes[y][x] = 2;
+                    holes[y+1][x] = 1;
+                    holes[y-1][x] =1;
+                }
+    if(x < gameMap[0].length -1 && y < gameMap[0].length-1 && x > 0
+     &&isBreeze(x+1,y)==true&&isBreeze(x,y+1)==true&&isBreeze(x-1,y)==true )
+     {
+        agentMap[y][x] = HOLE;
+
+        holes[y][x] = 2;
+        holes[y][x+1] = 1;
+        holes[y+1][x] =1;
+     }
+    if(x < gameMap[0].length -1 && y < gameMap[0].length-1 && y > 0
+        &&isBreeze(x+1,y)==true&&isBreeze(x,y+1)==true&&isBreeze(x,y-1)==true )
+        {
+           agentMap[y][x] = HOLE;
+   
+           holes[y][x] = 2;
+           holes[y][x+1] = 1;
+           holes[y+1][x] =1;
+        }
+    if(x  == gameMap[0].length && y == gameMap[0].length 
+        && isBreeze(x-1,y)==true && isBreeze(x,y-1)==true && isBreeze(x-2,y-1)==false){
+        agentMap[y][x] = HOLE;
+
+        holes[y][x] = 2;
+        holes[y][x-1] = 1;
+        holes[y-1][x] =1;
+    }
+    if(x == gameMap[0].length && y == 0 
+        && isBreeze(x,y+1)==true && isBreeze(x-1,y)==true && isBreeze(x-2,y+1)==false)
+    {
+        agentMap[y][x] = HOLE;
+
+        holes[y][x] = 2;
+        holes[y][x-1] = 1;
+        holes[y+1][x] =1;
+    }
+    if(y == gameMap[0].length && x == 0 && isBreeze(x,y-1)==true 
+    && isBreeze(x+1,y)==true && isBreeze(x+2,y-1)==false)
+    {
+        agentMap[y][x] = HOLE;
+
+        holes[y][x] = 2;
+        holes[y][x+1] = 1;
+        holes[y-1][x] =1;
+    }
+    if(y == 0 && x == 0 && isBreeze(x,y+1)==true && isBreeze(x+1,y)==true
+    && isBreeze(x+2,y+1)==false)
+    {
+        agentMap[y][x] = HOLE;
+
+        holes[y][x] = 2;
+        holes[y][x+1] = 1;
+        holes[y+1][x] =1;
+    }
+
+
+}
 function detectWampus(y,x){
-    if((wampuses[y-1][x]==1 && wampuses[y][x+1]==1)||(wampuses[y-1][x]==1 && wampuses[y][x-1]==1)
-    ||(wampuses[y+1][x]&&wampuses[y][x+1])||(wampuses[y+1][x]&&wampuses[y][x-1]))
-    wampuses[y][x]=2;
+    if(agentMap[y][x] != 0) {wampus[y][x] = -1; return;}
+
+    let psbl = undefined;
+
+    if(x > 0 && visited[x-1][y] && !isStench(x-1,y)) psbl = false;
+    if(y > 0 && visited[x][y-1] && !isStench(x,y-1)) psbl = false;
+    if(x < agentMap[0].length - 1 && visited[x+1][y] && !isStench(x+1,y)) psbl = false; 
+    if(y < agentMap.length - 1 && visited[x][y+1] && !isStench(x,y+1)) psbl = false; 
+
+    
+    if(x>0 && x < agentMap[0].length - 1 && visited[x-1][y] && visited[x+1][y]) psbl = true;
+    if(y>0 && y < agentMap.length - 1 && visited[x][y-1] && visited[x][y+1]) psbl = true;
+
+    let counter = 0;
+    if(y>0 && visited[x][y-1] && isStench(x,y-1)) counter++;
+    if(x < agentMap[0].length - 1 && y > 0 && visited[x+1][y-1] && !isStench(x+1,y-1)) counter++;
+    if(x < agentMap[0].length - 1 && visited[x+1][y] && isStench(x+1,y)) counter++;
+    if(x < agentMap[0].length - 1 && y < agentMap.length - 1 && visited[x+1][y] && !isStench(x+1,y+1)) counter++;
+    if(y < agentMap.length - 1 && visited[x][y] && isStench(x,y+1)) counter++;
+    if(x > 0 && y < agentMap.length - 1 && visited[x-1][y+1] && !isStench(x-1,y+1)) counter++;
+    if(x > 0 && visited[x-1][y] && isStench(x-1,y)) counter++;
+    if(x > 0 && y > 0 && visited[x-1][y-1] && !isStench(x-1,y-1)) counter++;
+
+    if(counter > 2) psbl = true;
+
+    switch(psbl){
+        case undefined: return;
+        case true: {
+             agentMap[y][x] = WAMPUS;
+             wampuses[y][x]=2;
+             wampus.x = x;
+             wampus.y = y;
+             return;
+        }
+        case false: {
+            wampuses[y][x]=-1;
+            if(y<agentMap.length - 1 && visited[y+1][x] && !isBreeze(y,x) && isStench(y+1,x) && agentMap[y][x-1] == 0) agentMap[y+1][x] = EMPTYNESS;
+             if(x>0 && visited[y][x-1] && !isBreeze(y,x) && isStench(y,x-1) && agentMap[y][x-1] == 0) agentMap[y][x-1] = EMPTYNESS;
+             if(y>0 && visited[y-1][x] && !isBreeze(y,x) && isStench(y-1,x) && agentMap[y][x-1] == 0) agentMap[y-1][x] = EMPTYNESS;
+             if(x<agentMap[0].length - 1 && visited[y][x+1] && !isBreeze(y,x) && isStench(y,x+1) && agentMap[y][x+1] == 0) agentMap[y][x+1] = EMPTYNESS;
+        }
+    }
+
 }
 
 
+/*function detectHole(y,x){
+    if(agentMap[y][x] == EMPTYNESS) {holes[y][x] = -1; return;}
+    if(x > 0 && y < gameMap[0].length-1 && y > 0 && x < gameMap[0].length-1
+         && isBreeze(x, y+1)==true && isBreeze(x-1,y)==true && isBreeze(x, y-1)==true && isBreeze(x,y-1)==true)
+         {
+             agentMap[y][x] = HOLE;
+             holes[y][x]=2;
+             
+         }
+}*/
+function detectWampus(y,x){
+    if(agentMap[y][x] == EMPTYNESS) {wampuses[y][x] = -1; return;}
+    if(y >0 && x > 0 && visited[y-1][x]==true && visited[y][x-1]==true && visited[x-1][y-1] ==true
+        && isStench(y-1,x)==true && isStench(y,x-1)==true && isStench(y-1,x-1)==false){
+        agentMap[y][x] = WAMPUS;
+        wampuses[y][x] = 2;
+        wampuses[y-1][x]=-1;
+        wampuses[y][x-1] = -1;
+        };
+    if(y > 0 && x < gameMap[0].length-1 && visited[y-1][x]==true
+     && vistsed [y][x-1] == true && visited[y-1][x-1]==True && isStench(y,x-1) == true 
+     && isStench(y-1,x)==true && isStench(y-1,x-1)==false){
+        agentMap[y][x] = WAMPUS;
+        wampuses[y][x] = 2;
+        wampuses[y-1][x]=-1;
+        wampuses[y][x+1] = -1;
+     };
+    if(y >0 && x < gameMap[0].length-1 && visited[y-1][x]==true && visited[y][x+1]==true 
+    && visited[y-1][x+1]==true && isStench(y-1,x)==true 
+    && isStench(y,x-1)==true && isStench(y-1,x+1)==false)
+    {
+        agentMap[y][x] = WAMPUS;
+        wampuses[y][x] = 2;
+        wampuses[y+1][x]=-1;
+        wampuses[y][x+1] = -1;
+    };
+    if(y < gameMap[0].length-1 && x >0 && visited[y+1][x]==true
+    && visited[y][x-1]==true && visited[y+1][x-1]==true 
+    && isStench(y+1,x)==true && isStench(y,x-1)&&isStench(y+1,x-1)==false){
+        agentMap[y][x] = WAMPUS;
+        wampuses[y][x] = 2;
+        wampuses[y+1][x]=-1;
+        wampuses[y][x-1] = -1;
+    }
+    if(y < gameMap[0].length -1 && y > 0 
+    && visited[y-1][x] == true && visited[y+1][x]== true 
+    && isStench(y-1,x)==true && isStench(y+1,x)==true){
+        agentMap[y][x] = WAMPUS;
+        wampuses[y][x] = 2;
+        wampuses[y+1][x] = 1;
+        wampuses[y-1][x] =1;
+    }
+}
+    /*
+    if(wampuses[y+1][x]==SMELL&&wampuses[y][x-1]==SMELL && wampuses[y+1][x-1]==-1){
+        wampuses[y][x] = 2;
+        wampuses[y+1][x]=-1;
+        wampuses[y][x-1] = -1;
+    };
+    if(wampuses[y+1][x] ==SMELL && wampuses[y-1][x]==SMELL){
+        wampuses[y][x] = 2;
+        wampuses[y+1][x] = 1;
+        wampuses[y-1][x] =1;
+    };
+    if(wampuses[y][x-1]==SMELL&&wampuses[y][x+1]==SMELL){
+        wampuses[y][x]=2;
+        wampuses[y][x-1]=1;
+        wampuses[y][x+1]=1;
+    }
+    
+}
+
+*/
 //---------------------------------------
 // Feel functions
 //---------------------------------------
@@ -514,10 +729,11 @@ function isBreeze(x, y){
 
 function isStench(x, y){
     if(!wampus.alive && gameMap[x][y] == SMELL) return true; 
+
     if(x > 0 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
     if(y > 0 && (gameMap[y-1][x] == WAMPUS || (gameMap[y-1][x] == SMELL))) return true;
-    if(x < gameMap[0].length - 1 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
-    if(y < gameMap.length - 1 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
+    if(x < gameMap[0].length - 1 && (gameMap[y][x+1] == WAMPUS || (gameMap[y][x+1] == SMELL))) return true;
+    if(y < gameMap.length - 1 && (gameMap[y+1][x] == WAMPUS || (gameMap[y+1][x] == SMELL))) return true;
     
     return false;
 }
