@@ -113,75 +113,6 @@ function eraseMap(){
 //---------------------------------------
 
 function setUpMap(){
-/*
-        agentMap = [
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [5,0,0,0,0,0],
-        ];  
-
-        gameMap = [
-            [2,2,1,3,2,2],
-            [1,2,9,2,1,2],
-            [1,1,2,2,1,2],
-            [2,1,2,1,1,1],
-            [2,7,2,2,1,9],
-            [2,2,2,2,2,2],
-            [2,1,1,1,2,1],
-            [2,2,1,2,2,9],
-            [5,2,1,2,1,2],
-        ];
-
-        visited = [
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [false,false,false,false,false,false],
-            [true,false,false,false,false,false],
-        ];
-
-        holes = [
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [-1,0,0,0,0,0],
-        ];
-
-        wampuses = [
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [0,0,0,0,0,0],
-            [-1,0,0,0,0,0],
-        ];
-
-        const WALL = 1;
-const EMPTYNESS = 2;
-const GOLD = 3;
-const AGENT = 5;
-const WAMPUS = 7;
-const HOLE = 9;
-const SMELL = 8;
-const WIND = 4;*/
 
         agentMap = 
         [[0,0,0,0],
@@ -634,13 +565,7 @@ function init(){
      }
 
     drawMap();
-    
-    // for(let i = 0; i <4; i++)
-    // setTimeout(step, 1000);
-    // setTimeout(step, 2000);
-    // setTimeout(step, 3000);
-    // setTimeout(step, 4000);
-    // setTimeout(step, 5000);
+
     setInterval(step,1000)
 
 }
