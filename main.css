@@ -24,8 +24,8 @@ body{
 }
 
 .container{
-    width: 150px;
-    height: 225px;
+    width: 100px;
+    height: 100px;
     margin: 50px auto;
 
     display: flex;

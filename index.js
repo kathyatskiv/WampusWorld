@@ -113,7 +113,7 @@ function eraseMap(){
 //---------------------------------------
 
 function setUpMap(){
-
+/*
         agentMap = [
             [0,0,0,0,0,0],
             [0,0,0,0,0,0],
@@ -174,19 +174,109 @@ function setUpMap(){
             [-1,0,0,0,0,0],
         ];
 
+        const WALL = 1;
+const EMPTYNESS = 2;
+const GOLD = 3;
+const AGENT = 5;
+const WAMPUS = 7;
+const HOLE = 9;
+const SMELL = 8;
+const WIND = 4;*/
+
+        agentMap = 
+        [[0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0]];
+        
+        holes = 
+        [[0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [-1,0,0,0]];
+
+        wampuses =
+        [[0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [-1,0,0,0]];
+
+        visited = [
+            [false,false,false,false],
+            [false,false,false,false],
+            [false,false,false,false],
+            [false,false,false,false]
+        ];
+
+        gameMap =
+        [[0,1,9,0],
+        [7,0,1,0],
+        [0,0,0,0],
+        [5,0,0,9]];
+
+        createMap(gameMap);
+
+        //console.log(emptyMap);
+        // console.log(gameMap);
+        // console.log(holes);
+        // console.log(wampuses);
         // 0 - no info, -1 = false, 1 - possible, 2 - exactly
     
+}
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //Максимум не включается, минимум включается
+}
+function createMap(map){
+    //they aren't on 0,n axis fix later
+    let wampus_x = getRandomInt(1,4);
+    let wampus_y = getRandomInt(1,4);
+    
+    
+    let hole_x = getRandomInt(1,4);
+    let hole_y = getRandomInt(1,4);
+
+  /*  map[wampus_x][wampus_y] = 7;
+    if(wampus_x!=0){
+    wampuses[wampus_x -1][wampus_y] = 8;
+    };
+    if(wampus_x!=3){
+    wampuses[wampus_x +1][wampus_y] = 8;
+    };
+    if(wampus_y!=0){
+    wampuses[wampus_x][wampus_y-1] = 8;
+    };
+    if(wampus_y!=3){
+    wampuses[wampus_x][wampus_y+1] = 8;
+    };
+
+    map[hole_x][hole_y] = 9;
+    if(hole_x!=0){
+        holes[hole_x -1][hole_y] = 4;
+        };
+    if(hole_x!=3){
+        holes[hole_x +1][hole_y] = 4;
+        };
+    if(hole_y!=0){
+        holes[hole_x][hole_y-1] = 4;
+        };
+    if(hole_y!=3){
+        holes[hole_x][hole_y+1] = 4;
+        };
+
+*/
 }
 
 function setUpHeroes(){
     pacman = {
         x: 0,
-        y: 8,
+        y: 3,
         direction: "right",
         tile: AGENT,
         under: EMPTYNESS
     };
-    
+// need to insert set up according to random map generation
     blinky = {
         x: 1,
         y: 4,
@@ -219,9 +309,12 @@ let wampus = {
 
 function step(){
     if(gameStatus > 0) return;
-    visited[pacman.y][pacman.x] = true;
-    let feeling = feel(pacman.x, pacman.y);
+    console.log(visited);
     console.log("pacman " + pacman.x + " " + pacman.y + " " + pacman.direction);
+    visited[pacman.y][pacman.x] = true;
+
+    let feeling = feel(pacman.x, pacman.y);
+
     for(let i = 0; i < agentMap.length; i++){
         console.log(agentMap[i]); 
      }
@@ -236,11 +329,11 @@ function step(){
         return;
     }
     
-    if(feeling[0])
-        pointAsWampus();
+   if(feeling[0])
+       pointAsWampus();
 
-    if(feeling[1])
-        pointAsHole(pacman.x, pacman.y);
+   if(feeling[1])
+       pointAsHole(pacman.x, pacman.y);
 
     if(!feeling[0] && !feeling[1]){
         if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == 0) agentMap[pacman.y][pacman.x+1] = EMPTYNESS;
@@ -259,6 +352,11 @@ function step(){
     
     
     logic();
+
+    for(let i = 0; i < holes.length; i++){
+        console.log(holes[i]); 
+     }
+
     heroMove();
     
     eraseMap();
@@ -303,34 +401,72 @@ function heroMove(){
         return;
     }
 
-    if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS){
-        agentMap[pacman.y][pacman.x] = EMPTYNESS;
-        agentMap[pacman.y][pacman.x-1] = AGENT;
-        pacman.direction = "left"; 
-        pacman.x--; 
-        return; 
+    let freeRoads = []
+    if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS) freeRoads.push("left");
+    if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS) freeRoads.push("down");
+    if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == EMPTYNESS) freeRoads.push("right");
+    if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == EMPTYNESS) freeRoads.push("up");
+
+    let go = freeRoads[getRandomInt(0, freeRoads.length)];
+    switch(go){
+        case "right": {
+            agentMap[pacman.y][pacman.x] = EMPTYNESS;
+            agentMap[pacman.y][pacman.x+1] = AGENT;
+            pacman.x++;
+            pacman.direction = "right";
+            return;
+        }
+        case "left": {
+            agentMap[pacman.y][pacman.x] = EMPTYNESS;
+            agentMap[pacman.y][pacman.x-1] = AGENT;
+            pacman.direction = "left"; 
+            pacman.x--; 
+            return;
+        }
+        case "up":{
+            agentMap[pacman.y][pacman.x] = EMPTYNESS;
+            agentMap[pacman.y-1][pacman.x] = AGENT;
+            pacman.direction = "up"; 
+            pacman.y--;
+            return;
+        }
+        case "down":{
+            agentMap[pacman.y][pacman.x] = EMPTYNESS;
+            agentMap[pacman.y+1][pacman.x] = AGENT;
+            pacman.direction = "down"; 
+            pacman.y++;
+        }
     }
-    if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS){
-        agentMap[pacman.y][pacman.x] = EMPTYNESS;
-        agentMap[pacman.y+1][pacman.x] = AGENT;
-        pacman.direction = "down"; 
-        pacman.y++;
-        return;
-    }
-    if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == EMPTYNESS) {
-        agentMap[pacman.y][pacman.x] = EMPTYNESS;
-        agentMap[pacman.y][pacman.x+1] = AGENT;
-        pacman.x++; 
-        pacman.direction = "right"; 
-        return;
-    }
-    if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == EMPTYNESS) {
-        agentMap[pacman.y][pacman.x] = EMPTYNESS;
-        agentMap[pacman.y-1][pacman.x] = AGENT;
-        pacman.y--;
-        pacman.direction = "up"; 
-        return;
-    }
+    
+
+    // if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS){
+    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
+    //     agentMap[pacman.y][pacman.x-1] = AGENT;
+    //     pacman.direction = "left"; 
+    //     pacman.x--; 
+    //     return; 
+    // }
+    // if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS){
+    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
+    //     agentMap[pacman.y+1][pacman.x] = AGENT;
+    //     pacman.direction = "down"; 
+    //     pacman.y++;
+    //     return;
+    // }
+    // if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == EMPTYNESS) {
+    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
+    //     agentMap[pacman.y][pacman.x+1] = AGENT;
+    //     pacman.x++; 
+    //     pacman.direction = "right"; 
+    //     return;
+    // }
+    // if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == EMPTYNESS) {
+    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
+    //     agentMap[pacman.y-1][pacman.x] = AGENT;
+    //     pacman.y--;
+    //     pacman.direction = "up"; 
+    //     return;
+    // }
 
     return;
 }
@@ -374,15 +510,26 @@ function goBack(){
 //---------------------------------------
 // Logic functions
 //---------------------------------------
+/*const WALL = 1;
+const EMPTYNESS = 2;
+const GOLD = 3;
+const AGENT = 5;
+const WAMPUS = 7;
+const HOLE = 9;
+const SMELL = 8;
+const WIND = 4;
+
+*/
 
 function logic(){
     for(let i = 0; i < gameMap.length; i++)
         for(let j = 0; j < gameMap[0].length; j++){
+            if(agentMap[i][j] == EMPTYNESS) {holes[i][j] = -1; wampuses[i][j] = -1;}
             if(holes[i][j] == 1) detectHole(i,j);
             if(wampuses[i][j] == 1) detectWampus(i,j);
         }
 }
-
+/*
 function pointAsHole(x,y){
     if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 ) holes[y][x-1] = 1;
     if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 ) holes[y-1][x] = 1;
@@ -395,14 +542,44 @@ function pointAsWampus(x,y){
     if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
     if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
     if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
+}*/
+function pointAsHole(x,y){
+    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && holes[y][x-1] == 0 && (isBreeze(x,y)||isBreeze(x+1,y)) ) holes[y][x-1] = 1;
+    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && holes[y-1][x] == 0 &&(isBreeze(x,y)||isBreeze(x+1,y))) holes[y-1][x] = 1;
+    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && holes[y+1][x] == 0 && (isBreeze(x,y)||isBreeze(x+1,y) )) holes[y+1][x] = 1;
+   // if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && holes[y][x+1] == 0 (isBreeze(x,y) || isBreeze(x+1,y))) holes[y][x+1] = 1;
 }
-
+function pointAsWampus(x,y){
+    if(x > 0 && agentMap[y][x-1] != EMPTYNESS && wampuses[y][x-1] == 0 ) wampuses[y][x-1] = 1;
+    if(y > 0 && agentMap[y-1][x] != EMPTYNESS && wampuses[y-1][x] == 0 ) wampuses[y-1][x] = 1;
+    if(y < gameMap.length - 1 && agentMap[y+1][x] != EMPTYNESS && wampuses[y+1][x] == 0 ) wampuses[y+1][x] = 1;
+    if(x < gameMap[0].length - 1 && agentMap[y][x+1] != EMPTYNESS && wampuses[y][x+1] == 0 ) wampuses[y][x+1] = 1;
+}
 function detectHole(y,x){
-   
-}
+    if(agentMap[y][x] == EMPTYNESS) {holes[y][x] = -1; return;}
+    // opposites
+   if(((x < gameMap[0].length - 1 && holes[y][x+1]==1) && (x>0 && holes[y][x-1]==1))|| ((y < gameMap.length - 1 && holes[y+1][x]==1) && (y>0 && holes[y-1][x]==1))) {
+       holes[y][x]=2;
+       agentMap[y][x] = 9;
+   }
+   // diagonal
+   //if((holes[y-1][x-1]==1 && holes [y+1][x+1]==1)||(holes[y-1][x+1]==1 && holes[y+1][x-1]==1)) holes[y][x] =2;
+   // corner
+   if(((y>0 && holes[y-1][x]==1) && (x < gameMap[0].length - 1 && holes[y][x+1]==1))
+   ||((y>0 && holes[y-1][x]==1) && (x < gameMap[0].length - 1 && holes[y][x-1]==1))
+   ||((y < gameMap.length - 1 && holes[y+1][x]) && (x < gameMap[0].length - 1 && holes[y][x+1]))
+   ||((y < gameMap.length - 1 && holes[y+1][x]) && (x>0 && holes[y][x-1]))){
+
+       holes[y][x]=2;
+       agentMap[y][x] = 9;
+   }
+
+   }
 
 function detectWampus(y,x){
-   
+    if((wampuses[y-1][x]==1 && wampuses[y][x+1]==1)||(wampuses[y-1][x]==1 && wampuses[y][x-1]==1)
+    ||(wampuses[y+1][x]&&wampuses[y][x+1])||(wampuses[y+1][x]&&wampuses[y][x-1]))
+    wampuses[y][x]=2;
 }
 
 
@@ -433,7 +610,9 @@ function isBreeze(x, y){
     return false;
 }
 
+
 function isStench(x, y){
+    if(!wampus.alive && gameMap[x][y] == SMELL) return true; 
     if(x > 0 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
     if(y > 0 && (gameMap[y-1][x] == WAMPUS || (gameMap[y-1][x] == SMELL))) return true;
     if(x < gameMap[0].length - 1 && (gameMap[y][x-1] == WAMPUS || (gameMap[y][x-1] == SMELL))) return true;
@@ -454,6 +633,7 @@ function isScream(){
     if(screem){
         screem = false;
         gameMap[blinky.y][blinky.x] = SMELL;
+        wampus.alive = false;
         return true;
     }
 
@@ -478,6 +658,10 @@ let game;
 function init(){
     setUpMap();
     setUpHeroes();
+
+    for(let i = 0; i < agentMap.length; i++){
+        console.log(gameMap[i]); 
+     }
 
     drawMap();
     
