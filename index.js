@@ -437,36 +437,6 @@ function heroMove(){
             pacman.y++;
         }
     }
-    
-
-    // if(pacman.x > 0 && agentMap[pacman.y][pacman.x-1] == EMPTYNESS){
-    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
-    //     agentMap[pacman.y][pacman.x-1] = AGENT;
-    //     pacman.direction = "left"; 
-    //     pacman.x--; 
-    //     return; 
-    // }
-    // if(pacman.y < gameMap.length - 1  && agentMap[pacman.y+1][pacman.x] == EMPTYNESS){
-    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
-    //     agentMap[pacman.y+1][pacman.x] = AGENT;
-    //     pacman.direction = "down"; 
-    //     pacman.y++;
-    //     return;
-    // }
-    // if(pacman.x < gameMap[0].length - 1 && agentMap[pacman.y][pacman.x+1] == EMPTYNESS) {
-    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
-    //     agentMap[pacman.y][pacman.x+1] = AGENT;
-    //     pacman.x++; 
-    //     pacman.direction = "right"; 
-    //     return;
-    // }
-    // if(pacman.y > 0 && agentMap[pacman.y-1][pacman.x] == EMPTYNESS) {
-    //     agentMap[pacman.y][pacman.x] = EMPTYNESS;
-    //     agentMap[pacman.y-1][pacman.x] = AGENT;
-    //     pacman.y--;
-    //     pacman.direction = "up"; 
-    //     return;
-    // }
 
     return;
 }
