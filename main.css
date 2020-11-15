@@ -24,8 +24,8 @@ body{
 }
 
 .container{
-    width: 500px;
-    height: 500px;
+    width: 400px;
+    height: 400px;
     margin: 50px auto;
 
     display: flex;
@@ -35,8 +35,8 @@ body{
 }
 
 .tile{
-    width: 125px;
-    height: 125px;
+    width: 100px;
+    height: 100px;
     
     background-color: bisque;
 }
@@ -114,6 +114,21 @@ body{
 
 .cherry{
     background-image: url(img/cherry.png);
+    background-size: contain;
+}
+
+.smell{
+    background-image: url(img/smell.png);
+    background-size: contain;
+}
+
+.wind{
+    background-image: url(img/wind.png);
+    background-size: contain;
+}
+
+.smell.wind{
+    background-image: url(img/smell.png), url(img/wind.png);
     background-size: contain;
 }
 
